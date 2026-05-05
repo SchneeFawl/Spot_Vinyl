@@ -3,6 +3,7 @@ from pathlib import Path
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton
+from buttons import *
 
 # root directory for the project
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -33,39 +34,18 @@ class MainWindow(QMainWindow):
         nameplate_l.setPixmap(nameplate)
         nameplate_l.setScaledContents(True)
 
-        self.closeButton()
 
-    def closeButton(self):
-        btn_close_img = (ASSETS_DIR / "btn_close.png").as_posix()
-        btn_close_pressed_img = (ASSETS_DIR / "btn_close_pressed.png").as_posix()
-        btn_close = QPushButton(self)
-        btn_close.setStyleSheet(f"""
-            QPushButton {{
-                background-image: url({btn_close_img});
-                background-color: transparent;
+        # buttons
+        self.closeButton = minimize_button(self)
+        self.minimizeButton = close_button(self)
+        self.settingsButton = settings_button(self)
+        self.previousButton = previous_button(self)
+        self.pauseButton = pause_button(self)
+        self.nextButton = next_button(self)
 
-                /* for some reasons there is hidden padding and borders */
-                border: none;
-                padding: 0px;
-                margin: 0px;
-                outline: none;
-            }}
-            QPushButton:pressed {{
-                background-image: url({btn_close_pressed_img});
-                background-color: transparent
-            }}
-        """)
-        # btn_close.move(440, 10)
-        # btn_close.setFixedSize(50, 55)
-        btn_close.setGeometry((88*5), 10, 50, 55)
+if __name__ == "__main__":
+    app = QApplication([])
+    window = MainWindow()
+    window.show()
 
-        # very niche but when the spacebar is pressed after the button is clicked via mouse,
-        # it registers it as a button press
-        btn_close.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-
-app = QApplication([])
-window = MainWindow()
-window.show()
-
-sys.exit(app.exec())
+    sys.exit(app.exec())
