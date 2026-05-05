@@ -36,20 +36,32 @@ class MainWindow(QMainWindow):
         self.closeButton()
 
     def closeButton(self):
-        # btn_close_l.setGeometry((88*5), 10, 50, 55)
-        btn_close_img = ASSETS_DIR / "btn_close.png"
-        btn_close_img_dir = btn_close_img.as_uri()
-        btn_close = QPushButton()
-        btn_close.setStyleSheet(f"background-image: url({btn_close_img_dir})")
-        '''
+        btn_close_img = (ASSETS_DIR / "btn_close.png").as_posix()
+        btn_close_pressed_img = (ASSETS_DIR / "btn_close_pressed.png").as_posix()
+        btn_close = QPushButton(self)
         btn_close.setStyleSheet(f"""
             QPushButton {{
-                background-image: url("{btn_close_img_dir}");
+                background-image: url({btn_close_img});
+                background-color: transparent;
+
+                /* for some reasons there is hidden padding and borders */
+                border: none;
+                padding: 0px;
+                margin: 0px;
+                outline: none;
+            }}
+            QPushButton:pressed {{
+                background-image: url({btn_close_pressed_img});
+                background-color: transparent
             }}
         """)
-        '''
-        btn_close.setGeometry(440, 10, 50, 55)
+        # btn_close.move(440, 10)
+        # btn_close.setFixedSize(50, 55)
+        btn_close.setGeometry((88*5), 10, 50, 55)
 
+        # very niche but when the spacebar is pressed after the button is clicked via mouse,
+        # it registers it as a button press
+        btn_close.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
 
 app = QApplication([])
