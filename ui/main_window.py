@@ -1,8 +1,9 @@
 import sys
 from pathlib import Path
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
-from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QPushButton
+from PyQt6.QtGui import QPixmap, QMovie
+from PyQt6.QtWidgets import \
+    QApplication, QMainWindow, QLabel, QPushButton
 from buttons import *
 
 # root directory for the project
@@ -34,6 +35,14 @@ class MainWindow(QMainWindow):
         nameplate_l.setPixmap(nameplate)
         nameplate_l.setScaledContents(True)
 
+        # vinyl animation
+        vinyl_label = QLabel(self)
+        vinyl_label.setGeometry((16*5), (20*5), 340, 340)
+        vinyl_path = ASSET_DIR / "vinyl.gif"
+        vinyl = QMovie(str(vinyl_path))
+        vinyl_label.setMovie(vinyl)
+        vinyl_label.setScaledContents(True)
+        vinyl.start()
 
         # buttons
         self.closeButton = minimize_button(self)
