@@ -2,6 +2,7 @@
 .zed
 ui/test.py
 test.py
+core/song_cover.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
