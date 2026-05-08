@@ -3,6 +3,8 @@
 ui/test.py
 test.py
 core/song_cover.png
+core/song_image.png
+core/cover.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

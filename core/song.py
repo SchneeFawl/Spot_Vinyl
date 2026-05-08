@@ -1,8 +1,6 @@
 import asyncio
 from winrt.windows.media.control import \
     GlobalSystemMediaTransportControlsSessionManager as MediaManager
-# from winrt.windows.storage.streams import \
-#    DataReader, Buffer, InputStreamOptions, IRandomAccessStream, IRandomAccessStreamReference
 from song_cover import thumbnail_saver as thumbnail_s
 
 async def song_info():
