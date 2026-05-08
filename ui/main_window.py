@@ -3,7 +3,7 @@ from pathlib import Path
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QMovie
 from PyQt6.QtWidgets import \
-    QApplication, QMainWindow, QLabel, QPushButton
+    QApplication, QMainWindow, QLabel
 from buttons import *
 
 # root directory for the project
@@ -34,6 +34,14 @@ class MainWindow(QMainWindow):
         nameplate = QPixmap(str(nameplate_path))
         nameplate_l.setPixmap(nameplate)
         nameplate_l.setScaledContents(True)
+
+        # album cover
+        album_label = QLabel(self)
+        album_label.setGeometry((32*5), (36*5), (38*5), (38*5))
+        album_path = ROOT_DIR / "core" / "song_cover.png"
+        album_cover = QPixmap(str(album_path))
+        album_label.setPixmap(album_cover)
+        album_label.setScaledContents(True)
 
         # vinyl animation
         vinyl_label = QLabel(self)
