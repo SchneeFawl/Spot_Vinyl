@@ -4,21 +4,29 @@ from winrt.windows.storage.streams import \
 from winrt.windows.media.control import \
     GlobalSystemMediaTransportControlsSessionManager as MediaManager
 from PIL import Image
+import io
 
 async def thumbnail_saver(thumbnail: IRandomAccessStreamReference):
-    # opening the stream buffer to get image data 
+    # opening the stream buffer to get image data (bytes)
     stream = await thumbnail.open_read_async()
     buffer = Buffer(stream.size)
     await stream.read_async(buffer, buffer.capacity, InputStreamOptions.NONE)
 
     reader = DataReader.from_buffer(buffer)
     thumb_bytes = bytearray(buffer.length)
-    byte_buffer = reader.read_bytes(thumb_bytes)
+    reader.read_bytes(thumb_bytes)
 
-    thumb_path = "core/song_image.png"
-    with open(thumb_path, "wb") as file:
-        file.write(thumb_bytes)
+    thumb = Image.open(io.BytesIO(thumb_bytes))
+    box = (33, 0, 267, 234)
+    final_thumb = thumb.crop(box)
 
+    # save cropped img into a new mem buffer
+    final_buffer = io.BytesIO()
+    final_thumb.save(final_buffer, format="PNG")
+
+    return final_buffer.getvalue()
+
+    """
     # image cropping:
     thumb_path_final = "core/song_cover.png"
     with Image.open(thumb_path) as img:
@@ -26,6 +34,7 @@ async def thumbnail_saver(thumbnail: IRandomAccessStreamReference):
         box = (33, 0, 267, 234)
         final_img = img.crop(box)
         final_img.save(thumb_path_final)
+    """
 
 '''     # Calling the function in song.py
 async def song_cover_fetch():

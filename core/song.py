@@ -3,11 +3,11 @@ import threading
 from winrt.windows.media.control import \
     GlobalSystemMediaTransportControlsSessionManager as MediaManager
 from PyQt6.QtCore import QObject, pyqtSignal
-from song_cover import thumbnail_saver as thumbnail_s
+from core.song_cover import thumbnail_saver as thumbnail_s
 
 class SpotifyListener(QObject):
-    # 3 strings for artist name, song name and  thumbnail
-    song_updated = pyqtSignal(str, str, str)
+    # 3 strings for artist name, song name and  thumbnail (bytes)
+    song_updated = pyqtSignal(str, str, bytes)
 
     def __init__(self):
         super().__init__()
@@ -24,13 +24,13 @@ class SpotifyListener(QObject):
     # attach windows smtc event callbacks
     async def _setup_events(self):
         self.manager = await MediaManager.request_async()
-        self._spotify_info()
+        await self._spotify_info()
         # when session changes, say spotify is closed and then reopened
         # --> reattach the spotify session without the need for restarting
         #     the entire app
         self.manager.add_sessions_changed(self._on_sessions_changed)
 
-    def _spotify_info(self):
+    async def _spotify_info(self):
         if self.manager is None:
             return
 
@@ -41,27 +41,35 @@ class SpotifyListener(QObject):
                 self.session = session
                 self.session.add_media_properties_changed(self._on_properties_changed)
                 # forcing immediate fetch on startup
-                self._on_properties_changed(self.session, None)
+                await self._fetch_song_info(self.session)
                 return
         self.session = None
 
     def _on_sessions_changed(self, manager, args):
-        self._spotify_info()
+        asyncio.run(self._spotify_info())
 
     def _on_properties_changed(self, session, args):
         # executing fetch function when the windows event triggers
         asyncio.run(self._fetch_song_info(session))
 
     async def _fetch_song_info(self, session):
-        info = await session.try_get_media_properties_async()
-        if info:
-            title = info.title
-            artist = info.artist
-            thumbnail_path = await thumbnail_s(info.thumbnail)
-            #print(title, artist)
+        try:
+            info = await session.try_get_media_properties_async()
 
-            if thumbnail_path:
-                self.song_updated.emit(title, artist, thumbnail_path)
+            if info:
+                # placeholder
+                title = info.title if info.title else "Unknown title"
+                artist = info.artist if info.artist else "Unknown artist"
+                #thumbnail_path = "assets/default_cover.png"
+                image_bytes = b""       # <-- empty byte string to get no NoneType error
+
+                if info.thumbnail:
+                    image_bytes = await thumbnail_s(info.thumbnail)
+
+                self.song_updated.emit(title, artist, image_bytes)
+
+        except Exception as e:
+            print(f"bg fetch error: {e}")
 
 if __name__ == "__main__":
     pass
