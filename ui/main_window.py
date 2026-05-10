@@ -40,7 +40,7 @@ class MainWindow(QMainWindow):
         nameplate_l.setScaledContents(True)
 
         # song name label
-        self.song_name = QLabel("sixty seven" ,self)
+        self.song_name = QLabel(self)
         self.song_name.setGeometry((25*5), (14*5), (50*5), (4*5))
         self.song_name.setStyleSheet(f"""
             QLabel {{
@@ -51,7 +51,7 @@ class MainWindow(QMainWindow):
         """)
 
         # artist name label
-        self.artist_name = QLabel("Epic Artist", self)
+        self.artist_name = QLabel(self)
         self.artist_name.setGeometry((60*5), (90*5), (50*5), (4*5))
         self.artist_name.setStyleSheet(f"""
             QLabel {{
@@ -73,25 +73,28 @@ class MainWindow(QMainWindow):
         vinyl_label = QLabel(self)
         vinyl_label.setGeometry((16*5), (20*5), 340, 340)
         vinyl_path = ASSETS_DIR / "vinyl.gif"
-        vinyl = QMovie(str(vinyl_path))
-        vinyl_label.setMovie(vinyl)
+        self.vinyl = QMovie(str(vinyl_path))
+        vinyl_label.setMovie(self.vinyl)
         vinyl_label.setScaledContents(True)
-        vinyl.start()
+        self.vinyl.start()
 
         # buttons
         self.closeButton = minimize_button(self)
         self.minimizeButton = close_button(self)
         self.settingsButton = settings_button(self)
         self.previousButton = previous_button(self)
-        self.pauseButton = pause_button(self)
+        self.playPauseButton = play_pause_button(self)
         self.nextButton = next_button(self)
 
         # background listeners
         self.listener = SpotifyListener()
         self.listener.song_updated.connect(self.info_update)
         self.listener.start_listener()
+        self.previousButton.clicked.connect(self.listener.prev_track)
+        self.playPauseButton.clicked.connect(self.listener.toggle_play_pause)
+        self.nextButton.clicked.connect(self.listener.next_track)
 
-    def info_update(self, title, artist, image_bytes):
+    def info_update(self, title, artist, image_bytes, is_playing):
         self.song_name.setText(title)
         self.artist_name.setText(artist)
         
@@ -106,12 +109,37 @@ class MainWindow(QMainWindow):
             # eg case - say someone is skipping songs rapidly (maybe 6 or 7 within 2 seconds)
             except PermissionError:
                 print(f"thumbnail was locked, skipping this update frame")
-
             except Exception as e:
                 print(f"error loading new cover: {e}")
         else:
             new_cover = QPixmap(str(ASSETS_DIR / "default_cover.png"))  # this pic is transparent
             self.album_label.setPixmap(new_cover)
+
+        # vinyl animation state
+        self.vinyl.setPaused(not is_playing)
+
+        # play/pause button cahnge
+        if is_playing:
+            btn_img = (ASSETS_DIR / "btn_pause.png").as_posix()
+            btn_pressed_img = (ASSETS_DIR / "btn_pause_pressed.png").as_posix()
+        else:
+            btn_img = (ASSETS_DIR / "btn_play.png").as_posix()
+            btn_pressed_img = (ASSETS_DIR / "btn_play_pressed.png").as_posix()
+
+        self.playPauseButton.setStyleSheet(f"""
+            QPushButton {{
+                background-image: url({btn_img});
+                background-color: transparent;
+                border: none;
+                padding: 0px;
+                margin: 0px;
+                outline: none;
+            }}
+            QPushButton:pressed {{
+                background-image: url({btn_pressed_img});
+                background-color: transparent;
+            }}
+        """)
 
 if __name__ == "__main__":
     app = QApplication([])

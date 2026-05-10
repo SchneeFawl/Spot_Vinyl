@@ -1,13 +1,15 @@
 import asyncio
 import threading
 from winrt.windows.media.control import \
-    GlobalSystemMediaTransportControlsSessionManager as MediaManager
+    GlobalSystemMediaTransportControlsSessionManager as MediaManager, \
+    GlobalSystemMediaTransportControlsSessionPlaybackStatus as PlaybackStatus
 from PyQt6.QtCore import QObject, pyqtSignal
 from core.song_cover import thumbnail_saver as thumbnail_s
 
 class SpotifyListener(QObject):
-    # 3 strings for artist name, song name and  thumbnail (bytes)
-    song_updated = pyqtSignal(str, str, bytes)
+    # 3 strings for artist name, song name, thumbnail (bytes) and
+    # playback status (bool)
+    song_updated = pyqtSignal(str, str, bytes, bool)
 
     def __init__(self):
         super().__init__()
@@ -40,6 +42,7 @@ class SpotifyListener(QObject):
             if "spotify" in app_id:
                 self.session = session
                 self.session.add_media_properties_changed(self._on_properties_changed)
+                self.session.add_playback_info_changed(self._on_playback_changed)
                 # forcing immediate fetch on startup
                 await self._fetch_song_info(self.session)
                 return
@@ -52,24 +55,62 @@ class SpotifyListener(QObject):
         # executing fetch function when the windows event triggers
         asyncio.run(self._fetch_song_info(session))
 
+    def _on_playback_changed(self, session, args):
+        # executing fetch func when play/pause state triggers
+        asyncio.run(self._fetch_song_info(session))
+
     async def _fetch_song_info(self, session):
         try:
             info = await session.try_get_media_properties_async()
+            playback_info = session.get_playback_info()
 
-            if info:
-                # placeholder
-                title = info.title if info.title else "Unknown title"
-                artist = info.artist if info.artist else "Unknown artist"
-                #thumbnail_path = "assets/default_cover.png"
+            if info and playback_info:
+                # enum 4 = playing
+                is_playing = playback_info.playback_status == PlaybackStatus.PLAYING
+
+                # advert check:
+                if info.title and not info.artist:
+                    title = "Advertisement playing"
+                    artist = "Unknown"
+                else:
+                    # placeholders
+                    title = info.title if info.title else "Unknown title"
+                    artist = info.artist if info.artist else "Unknown artist"
+
                 image_bytes = b""       # <-- empty byte string to get no NoneType error
 
                 if info.thumbnail:
                     image_bytes = await thumbnail_s(info.thumbnail)
 
-                self.song_updated.emit(title, artist, image_bytes)
+                self.song_updated.emit(title, artist, image_bytes, is_playing)
 
         except Exception as e:
             print(f"bg fetch error: {e}")
+
+    def toggle_play_pause(self):
+        session = self.session
+        if session:
+            async def _action():
+                await session.try_toggle_play_pause_async()
+
+            threading.Thread(target=lambda: asyncio.run(_action()), daemon=True).start()
+
+    def next_track(self):
+        session = self.session
+        if session:
+            async def _action():
+                await session.try_skip_next_async()
+
+            threading.Thread(target=lambda: asyncio.run(_action()), daemon=True).start()
+
+    def prev_track(self):
+        session = self.session
+        if session:
+            async def _action():
+                await session.try_skip_previous_async()
+
+            threading.Thread(target=lambda: asyncio.run(_action()), daemon=True).start()
+
 
 if __name__ == "__main__":
     pass

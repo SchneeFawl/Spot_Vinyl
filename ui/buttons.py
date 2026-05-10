@@ -8,7 +8,7 @@ from pathlib import Path
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 ASSET_DIR = PROJECT_DIR / "assets"
 
-def close_button(parent):
+def close_button(parent) -> QPushButton:
     btn_close_img = (ASSET_DIR / "btn_close.png").as_posix()
     btn_close_pressed_img = (ASSET_DIR / "btn_close_pressed.png").as_posix()
     button = QPushButton(parent)
@@ -36,7 +36,7 @@ def close_button(parent):
 
     return button
 
-def minimize_button(parent):
+def minimize_button(parent) -> QPushButton:
     btn_img = (ASSET_DIR / "btn_minimize.png").as_posix()
     btn_pressed_img = (ASSET_DIR / "btn_minimize_pressed.png").as_posix()
     button = QPushButton(parent)
@@ -59,7 +59,7 @@ def minimize_button(parent):
 
     return button
 
-def settings_button(parent):
+def settings_button(parent) -> QPushButton:
     btn_img = (ASSET_DIR / "btn_settings.png").as_posix()
     btn_pressed_img = (ASSET_DIR / "btn_settings_pressed.png").as_posix()
     button = QPushButton(parent)
@@ -80,7 +80,9 @@ def settings_button(parent):
     button.setGeometry((64*5), (2*5), 50, 55)
     button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-def previous_button(parent):
+    return button
+
+def previous_button(parent) -> QPushButton:
     btn_img = (ASSET_DIR / "btn_previous.png").as_posix()
     btn_pressed_img = (ASSET_DIR / "btn_previous_pressed.png").as_posix()
     button = QPushButton(parent)
@@ -101,7 +103,9 @@ def previous_button(parent):
     button.setGeometry((2*5), (87*5), 50, 55)
     button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-def pause_button(parent):
+    return button
+
+def play_pause_button(parent) -> QPushButton:
     btn_img = (ASSET_DIR / "btn_pause.png").as_posix()
     btn_pressed_img = (ASSET_DIR / "btn_pause_pressed.png").as_posix()
     button = QPushButton(parent)
@@ -122,7 +126,9 @@ def pause_button(parent):
     button.setGeometry((14*5), (87*5), 50, 55)
     button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-def next_button(parent):
+    return button
+
+def next_button(parent) -> QPushButton:
     btn_img = (ASSET_DIR / "btn_next.png").as_posix()
     btn_pressed_img = (ASSET_DIR / "btn_next_pressed.png").as_posix()
     button = QPushButton(parent)
@@ -142,3 +148,5 @@ def next_button(parent):
     """)
     button.setGeometry((26*5), (87*5), 50, 55)
     button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+    return button
