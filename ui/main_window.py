@@ -1,16 +1,17 @@
 import sys
+import ctypes
 from pathlib import Path
 # root directory for the project
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
 
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap, QMovie
+from PyQt6.QtGui import \
+    QPixmap, QMovie, QFontMetrics, QFontDatabase, QFont, QAction, QIcon
 from PyQt6.QtWidgets import \
-    QApplication, QMainWindow, QLabel
+    QApplication, QMainWindow, QLabel, QSystemTrayIcon, QMenu
 from buttons import *
 from core.song import SpotifyListener
-
 
 ASSETS_DIR = ROOT_DIR / "assets"
 
@@ -19,9 +20,32 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         self.setWindowTitle("Spot_Vinyl")
+        self.setWindowIcon(QIcon(str(ASSETS_DIR / "icon.png")))
         self.setFixedSize(500, 500)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)    # for transparent bg
+
+        # sys tray
+        self.tray_icon = QSystemTrayIcon()
+        self.tray_icon.setIcon(QIcon(str(ASSETS_DIR / "icon.png")))
+
+        tray_menu = QMenu()
+        show_hide_action = QAction("Show / Hide", self)
+        quit_action = QAction("Quit", self)
+        tray_menu.addAction(show_hide_action)
+        tray_menu.addSeparator()
+        tray_menu.addAction(quit_action)
+
+        show_hide_action.triggered.connect(self.toggle_window)
+        quit_action.triggered.connect(QApplication.quit)
+
+        self.tray_icon.setContextMenu(tray_menu)
+        self.tray_icon.show()
+
+        # the custom font (04B_03.TTF)
+        font_id = QFontDatabase.addApplicationFont(str(ASSETS_DIR / "04B_03.TTF"))
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        custom_font = QFont(font_family, 16)        # font size = 15
 
         # the main background image
         BG_LABEL = QLabel(self)
@@ -41,25 +65,33 @@ class MainWindow(QMainWindow):
 
         # song name label
         self.song_name = QLabel(self)
-        self.song_name.setGeometry((25*5), (14*5), (50*5), (4*5))
+        self.song_name.setGeometry((18*5), (14*5), (64*5), (4*5))
+        song_name_bg_path = (ASSETS_DIR / "song_name_bg.png").as_posix()
         self.song_name.setStyleSheet(f"""
             QLabel {{
-                color: #FFF0BE;
-                font-weight: bold;
-                font-size: 17px;
+                color: #3e2723;
+                background-image: url({song_name_bg_path});
+                padding-right: 10px;
+                padding-left: 10px;
             }}
         """)
+        self.song_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.song_name.setFont(custom_font)
 
         # artist name label
         self.artist_name = QLabel(self)
-        self.artist_name.setGeometry((60*5), (90*5), (50*5), (4*5))
+        self.artist_name.setGeometry((60*5), (90*5), (34*5), (4*5))
+        artist_name_bg_path = (ASSETS_DIR / "artist_name_bg.png").as_posix()
         self.artist_name.setStyleSheet(f"""
             QLabel {{
-                color: #FFF0BE;
-                font-weight: bold;
-                font-size: 17px;
+                color: #5c4d42;
+                background-image: url({artist_name_bg_path});
+                padding-right: 10px;
+                padding-left: 10px;
             }}
         """)
+        self.artist_name.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.artist_name.setFont(custom_font)
 
         # album cover
         self.album_label = QLabel(self)
@@ -79,8 +111,10 @@ class MainWindow(QMainWindow):
         self.vinyl.start()
 
         # buttons
-        self.closeButton = minimize_button(self)
-        self.minimizeButton = close_button(self)
+        self.closeButton = close_button(self)
+        self.closeButton.clicked.connect(self.hide)     # hide
+        self.minimizeButton = minimize_button(self)
+        self.minimizeButton.clicked.connect(self.showMinimized)     # minimize
         self.settingsButton = settings_button(self)
         self.previousButton = previous_button(self)
         self.playPauseButton = play_pause_button(self)
@@ -93,6 +127,16 @@ class MainWindow(QMainWindow):
         self.previousButton.clicked.connect(self.listener.prev_track)
         self.playPauseButton.clicked.connect(self.listener.toggle_play_pause)
         self.nextButton.clicked.connect(self.listener.next_track)
+
+    def mousePressEvent(self, event):
+        if event.buttons() == Qt.MouseButton.LeftButton:
+            self.drag_position = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+            event.accept()
+    
+    def mouseMoveEvent(self, event):
+        if event.buttons() == Qt.MouseButton.LeftButton:
+            self.move(event.globalPosition().toPoint() - self.drag_position)
+            event.accept()
 
     def info_update(self, title, artist, image_bytes, is_playing):
         self.song_name.setText(title)
@@ -114,6 +158,20 @@ class MainWindow(QMainWindow):
         else:
             new_cover = QPixmap(str(ASSETS_DIR / "default_cover.png"))  # this pic is transparent
             self.album_label.setPixmap(new_cover)
+
+        # adding '...' if song name too long
+        metrics_song = QFontMetrics(self.song_name.font())
+        elided_title = metrics_song.elidedText(title, 
+                                              Qt.TextElideMode.ElideRight,
+                                              self.song_name.width() - 20)    # -20 because padding
+        self.song_name.setText(elided_title)
+
+        # adding '...' if artist name too long
+        metrics_artist = QFontMetrics(self.artist_name.font())
+        elided_name = metrics_artist.elidedText(artist,
+                                                Qt.TextElideMode.ElideRight, 
+                                                self.artist_name.width() - 20)
+        self.artist_name.setText(elided_name)
 
         # vinyl animation state
         self.vinyl.setPaused(not is_playing)
@@ -141,7 +199,20 @@ class MainWindow(QMainWindow):
             }}
         """)
 
+    def toggle_window(self):
+        if self.isVisible():
+            self.hide()
+        else:
+            self.showNormal()
+            self.activateWindow()
+
 if __name__ == "__main__":
+    my_app_id = "spot_vinyl.desktop_widget.v1.0"
+    try:
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(my_app_id)
+    except AttributeError:
+        pass
+
     app = QApplication([])
     window = MainWindow()
     window.show()
