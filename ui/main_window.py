@@ -9,9 +9,10 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import \
     QPixmap, QMovie, QFontMetrics, QFontDatabase, QFont, QAction, QIcon
 from PyQt6.QtWidgets import \
-    QApplication, QMainWindow, QLabel, QSystemTrayIcon, QMenu
+    QApplication, QMainWindow, QLabel, QSystemTrayIcon, QMenu, QStackedWidget, QWidget
 from buttons import *
 from core.song import SpotifyListener
+from settings_menu import *
 
 ASSETS_DIR = ROOT_DIR / "assets"
 
@@ -55,8 +56,17 @@ class MainWindow(QMainWindow):
         BG_LABEL.setPixmap(BACKGROUND)
         BG_LABEL.setScaledContents(True)
 
+        # create stacked widget
+        self.stacked_widget = QStackedWidget(self)
+        self.stacked_widget.setGeometry(0, 0, 500, 500)
+
+        self.main_page = QWidget()
+        self.main_page.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        self.settings_page = SettingsMenu(parent=self, assets_dir=ASSETS_DIR)
+
         # nameplate
-        nameplate_l = QLabel(self)
+        nameplate_l = QLabel(self.main_page)
         nameplate_l.setGeometry(15, 15, 200, 45)
         nameplate_path = ASSETS_DIR / "nameplate.png"
         nameplate = QPixmap(str(nameplate_path))
@@ -64,7 +74,7 @@ class MainWindow(QMainWindow):
         nameplate_l.setScaledContents(True)
 
         # song name label
-        self.song_name = QLabel(self)
+        self.song_name = QLabel(self.main_page)
         self.song_name.setGeometry((18*5), (14*5), (64*5), (4*5))
         song_name_bg_path = (ASSETS_DIR / "song_name_bg.png").as_posix()
         self.song_name.setStyleSheet(f"""
@@ -79,7 +89,7 @@ class MainWindow(QMainWindow):
         self.song_name.setFont(custom_font)
 
         # artist name label
-        self.artist_name = QLabel(self)
+        self.artist_name = QLabel(self.main_page)
         self.artist_name.setGeometry((60*5), (90*5), (34*5), (4*5))
         artist_name_bg_path = (ASSETS_DIR / "artist_name_bg.png").as_posix()
         self.artist_name.setStyleSheet(f"""
@@ -94,7 +104,7 @@ class MainWindow(QMainWindow):
         self.artist_name.setFont(custom_font)
 
         # album cover
-        self.album_label = QLabel(self)
+        self.album_label = QLabel(self.main_page)
         self.album_label.setGeometry((32*5), (36*5), (38*5), (38*5))
         album_path = ROOT_DIR / "core" / "song_cover.png"
         album_cover = QPixmap(str(album_path))
@@ -102,7 +112,7 @@ class MainWindow(QMainWindow):
         self.album_label.setScaledContents(True)
 
         # vinyl animation
-        vinyl_label = QLabel(self)
+        vinyl_label = QLabel(self.main_page)
         vinyl_label.setGeometry((16*5), (20*5), 340, 340)
         vinyl_path = ASSETS_DIR / "vinyl.gif"
         self.vinyl = QMovie(str(vinyl_path))
@@ -110,15 +120,22 @@ class MainWindow(QMainWindow):
         vinyl_label.setScaledContents(True)
         self.vinyl.start()
 
+        # stack pages
+        self.stacked_widget.addWidget(self.main_page)           # index 0
+        self.stacked_widget.addWidget(self.settings_page)       # index 1
+
         # buttons
-        self.closeButton = close_button(self)
+        self.closeButton = close_button(self.main_page)
         self.closeButton.clicked.connect(self.hide)     # hide
-        self.minimizeButton = minimize_button(self)
+        self.minimizeButton = minimize_button(self.main_page)
         self.minimizeButton.clicked.connect(self.showMinimized)     # minimize
-        self.settingsButton = settings_button(self)
-        self.previousButton = previous_button(self)
-        self.playPauseButton = play_pause_button(self)
-        self.nextButton = next_button(self)
+        self.settingsButton = settings_button(self.main_page)
+        self.settingsButton.clicked.connect(self.show_settings_page)    # show settings
+        self.previousButton = previous_button(self.main_page)
+        self.playPauseButton = play_pause_button(self.main_page)
+        self.nextButton = next_button(self.main_page)
+
+        self.settings_page.stng_close_btn.clicked.connect(self.show_main_page)
 
         # background listeners
         self.listener = SpotifyListener()
@@ -127,6 +144,12 @@ class MainWindow(QMainWindow):
         self.previousButton.clicked.connect(self.listener.prev_track)
         self.playPauseButton.clicked.connect(self.listener.toggle_play_pause)
         self.nextButton.clicked.connect(self.listener.next_track)
+
+    def show_settings_page(self):
+        self.stacked_widget.setCurrentIndex(1)
+
+    def show_main_page(self):
+        self.stacked_widget.setCurrentIndex(0)
 
     def mousePressEvent(self, event):
         if event.buttons() == Qt.MouseButton.LeftButton:

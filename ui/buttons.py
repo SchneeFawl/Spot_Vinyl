@@ -150,3 +150,28 @@ def next_button(parent) -> QPushButton:
     button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
     return button
+
+'''
+def stng_close_button(parent) -> QPushButton:
+    button = QPushButton()
+    button_close_img = (ASSET_DIR / "btn_close.png").as_posix() # type: ignore
+    button_close_pressed_img = (ASSET_DIR / "btn_close_pressed.png").as_posix() # type: ignore
+    button.setStyleSheet(f"""
+        QPushButton {{
+            background-image: url({button_close_img});
+            background-color: transparent;
+            padding: 0px;
+            border: none;
+            margin: 0px;
+            outline: none;
+        }}
+        QPushButton:pressed {{
+            background-image: url({button_close_pressed_img});
+            background-color: transparent;
+        }}
+    """)
+    button.setGeometry((85*5), (5*5), (10*5), (11*5))
+    button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+    
+    return button
+'''
