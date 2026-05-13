@@ -73,7 +73,6 @@ class SpotifyListener(QObject):
                     title = "Advertisement playing"
                     artist = "Unknown"
                 else:
-                    # placeholders
                     title = info.title if info.title else "Unknown title"
                     artist = info.artist if info.artist else "Unknown artist"
 

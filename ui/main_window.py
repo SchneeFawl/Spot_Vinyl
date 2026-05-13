@@ -26,7 +26,6 @@ class MainWindow(QMainWindow):
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)    # for transparent bg
 
-        # sys tray
         self.tray_icon = QSystemTrayIcon()
         self.tray_icon.setIcon(QIcon(str(ASSETS_DIR / "icon.png")))
 
@@ -43,12 +42,11 @@ class MainWindow(QMainWindow):
         self.tray_icon.setContextMenu(tray_menu)
         self.tray_icon.show()
 
-        # the custom font (04B_03.TTF)
+        # custom font (04B_03.TTF)
         font_id = QFontDatabase.addApplicationFont(str(ASSETS_DIR / "04B_03.TTF"))
         font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
         custom_font = QFont(font_family, 16)        # font size = 15
 
-        # the main background image
         BG_LABEL = QLabel(self)
         BG_LABEL.setGeometry(0, 0, 500, 500)
         bg_path = ASSETS_DIR / "bg_main.png"
@@ -120,7 +118,6 @@ class MainWindow(QMainWindow):
         vinyl_label.setScaledContents(True)
         self.vinyl.start()
 
-        # stack pages
         self.stacked_widget.addWidget(self.main_page)           # index 0
         self.stacked_widget.addWidget(self.settings_page)       # index 1
 
@@ -196,7 +193,6 @@ class MainWindow(QMainWindow):
                                                 self.artist_name.width() - 20)
         self.artist_name.setText(elided_name)
 
-        # vinyl animation state
         self.vinyl.setPaused(not is_playing)
 
         # play/pause button cahnge
