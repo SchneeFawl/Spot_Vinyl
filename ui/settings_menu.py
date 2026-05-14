@@ -47,9 +47,10 @@ class SettingsMenu(QWidget):
         """)
         self.stng_close_btn.setGeometry((85*5), (5*5), (10*5), (11*5))
 
+        # webhook input
         self.webhook_input = QLineEdit(self)
         self.webhook_input.setPlaceholderText("Discord Webhook URL")
-        self.webhook_input.setGeometry((5*10), (20*5), (72*5), (8*5))
+        self.webhook_input.setGeometry((5*10), (19*5), (72*5), (8*5))
         webhook_input_img = (assets_dir / "webhook_box.png").as_posix()    # type: ignore
         self.webhook_input.setStyleSheet(f"""
             QLineEdit {{
@@ -64,11 +65,11 @@ class SettingsMenu(QWidget):
         """)
         self.webhook_input.setFont(QFont(custom_font))
 
+        # enable webhook checkbox
         self.als_on_top = QCheckBox("", self)
-        # self.als_on_top.setGeometry((10*5),(32*5), (40*5), (10*5))
-        self.als_on_top.setGeometry((10*5),(32*5), (50), (10*5))
-        als_on_top_img = (assets_dir / "on_top_checkbox.png").as_posix()   # type: ignore
-        als_on_top_checked_img = (assets_dir / "on_top_checkbox_checked.png").as_posix()   # type: ignore
+        self.als_on_top.setGeometry((10*5),(31*5), (50), (10*5))
+        webhook_img = (assets_dir / "on_top_checkbox.png").as_posix()   # type: ignore
+        webhook_checked_img = (assets_dir / "on_top_checkbox_checked.png").as_posix()   # type: ignore
         self.als_on_top.setStyleSheet(f"""
             QCheckBox::indicator {{
                 width: 50px;
@@ -76,16 +77,16 @@ class SettingsMenu(QWidget):
                 outline: none
             }}
             QCheckBox::indicator:unchecked {{
-                image: url({als_on_top_img});
+                image: url({webhook_img});
             }}
             QCheckBox::indicator:checked {{
-                background-image: url({als_on_top_checked_img});
+                background-image: url({webhook_checked_img});
             }}
         """)
 
-        self.on_top_label = QLabel("Always on top mode", self)
+        self.on_top_label = QLabel("Enable Webhook", self)
         self.on_top_label.setFont(QFont(custom_font))
-        self.on_top_label.setGeometry((22*5), (34*5), (50*5), (6*5))
+        self.on_top_label.setGeometry((22*5), (33*5), (50*5), (6*5))
         self.on_top_label.setStyleSheet(f"""
             QLabel {{
                 color: #6d4053;
@@ -93,7 +94,7 @@ class SettingsMenu(QWidget):
         """)
 
         self.theme_label = QLabel("Select theme:", self)
-        self.theme_label.setGeometry((10*5), (46*5), (30*5), (6*5))
+        self.theme_label.setGeometry((10*5), (45*5), (30*5), (6*5))
         self.theme_label.setFont(QFont(custom_font))
         self.theme_label.setStyleSheet(f"""
             QLabel {{
@@ -101,9 +102,10 @@ class SettingsMenu(QWidget):
             }}
         """)
 
+        # theme selection combo box
         self.theme_dropdown = QComboBox(self)
         self.theme_dropdown.addItems(["Classic", "Space"])  # placeholder themes
-        self.theme_dropdown.setGeometry((10*5), (52*5), (40*5), (8*5))
+        self.theme_dropdown.setGeometry((10*5), (51*5), (40*5), (8*5))
         theme_dropdown_img = (assets_dir / "theme_combobox.png").as_posix() # type: ignore
         theme_dropdown_arrow_img = (assets_dir / "theme_combobox_arrow.png").as_posix() # type: ignore
         theme_dropdown_list_img = (assets_dir / "theme_combobox_list.png").as_posix() # type: ignore
@@ -133,8 +135,37 @@ class SettingsMenu(QWidget):
             }}
         """)
 
+        # always on top button
+        self.als_on_top = QCheckBox("", self)
+        self.als_on_top.setGeometry((10*5),(63*5), (50), (10*5))
+        als_on_top_img = (assets_dir / "on_top_checkbox.png").as_posix()   # type: ignore
+        als_on_top_checked_img = (assets_dir / "on_top_checkbox_checked.png").as_posix()   # type: ignore
+        self.als_on_top.setStyleSheet(f"""
+            QCheckBox::indicator {{
+                width: 50px;
+                height: 50px;
+                outline: none
+            }}
+            QCheckBox::indicator:unchecked {{
+                image: url({als_on_top_img});
+            }}
+            QCheckBox::indicator:checked {{
+                background-image: url({als_on_top_checked_img});
+            }}
+        """)
+
+        self.on_top_label = QLabel("Always on top mode", self)
+        self.on_top_label.setFont(QFont(custom_font))
+        self.on_top_label.setGeometry((22*5), (65*5), (50*5), (6*5))
+        self.on_top_label.setStyleSheet(f"""
+            QLabel {{
+                color: #6d4053;
+            }}
+        """)
+
+        # discord webhook test butotn
         self.test_discord_btn = QPushButton("Test Webhook", self)
-        self.test_discord_btn.setGeometry((10*5), (66*5), (40*5), (9*5))
+        self.test_discord_btn.setGeometry((10*5), (78*5), (40*5), (9*5))
         test_discord_img = (assets_dir / "btn_webhook_test.png").as_posix() # type: ignore
         test_discord_pressed_img = (assets_dir / "btn_webhook_test_pressed.png").as_posix() # type: ignore
         self.test_discord_btn.setStyleSheet(f"""
