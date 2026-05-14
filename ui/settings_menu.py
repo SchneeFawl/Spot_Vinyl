@@ -1,11 +1,11 @@
 from PyQt6.QtWidgets import \
     QWidget, QLabel, QPushButton, QLineEdit, QCheckBox, QComboBox
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QFont, QFontDatabase
 from pathlib import Path
 
 root_dir = Path(__file__).resolve().parent.parent
-# assets_dir = root_dir / "assets"
+assets_dir = root_dir / "assets"
 
 class SettingsMenu(QWidget):
     def __init__(self, parent = None, assets_dir = None):
@@ -13,6 +13,11 @@ class SettingsMenu(QWidget):
 
         self.setFixedSize(500, 500)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+
+        # custom font (04B_03.TTF)
+        font_id = QFontDatabase.addApplicationFont(str(assets_dir / "04B_03.TTF")) # type: ignore
+        font_family = QFontDatabase.applicationFontFamilies(font_id)[0]
+        custom_font = QFont(font_family, 16)        # font size = 16
 
         # bg
         self.bg_label = QLabel(self)
@@ -43,7 +48,7 @@ class SettingsMenu(QWidget):
         self.stng_close_btn.setGeometry((85*5), (5*5), (10*5), (11*5))
 
         self.webhook_input = QLineEdit(self)
-        self.webhook_input.setPlaceholderText("Paste Discord Webhook URL here")
+        self.webhook_input.setPlaceholderText("Discord Webhook URL")
         self.webhook_input.setGeometry((5*10), (20*5), (72*5), (8*5))
         webhook_input_img = (assets_dir / "webhook_box.png").as_posix()    # type: ignore
         self.webhook_input.setStyleSheet(f"""
@@ -54,8 +59,10 @@ class SettingsMenu(QWidget):
                 padding: 10px;
                 margin: 0px;
                 outline: none;
+                color: #e66685;
             }}
         """)
+        self.webhook_input.setFont(QFont(custom_font))
 
         self.als_on_top = QCheckBox("", self)
         # self.als_on_top.setGeometry((10*5),(32*5), (40*5), (10*5))
@@ -66,6 +73,7 @@ class SettingsMenu(QWidget):
             QCheckBox::indicator {{
                 width: 50px;
                 height: 50px;
+                outline: none
             }}
             QCheckBox::indicator:unchecked {{
                 image: url({als_on_top_img});
@@ -75,8 +83,23 @@ class SettingsMenu(QWidget):
             }}
         """)
 
+        self.on_top_label = QLabel("Always on top mode", self)
+        self.on_top_label.setFont(QFont(custom_font))
+        self.on_top_label.setGeometry((22*5), (34*5), (50*5), (6*5))
+        self.on_top_label.setStyleSheet(f"""
+            QLabel {{
+                color: #6d4053;
+            }}
+        """)
+
         self.theme_label = QLabel("Select theme:", self)
-        self.theme_label.setGeometry((10*5), (46*5), (20*5), (6*5))
+        self.theme_label.setGeometry((10*5), (46*5), (30*5), (6*5))
+        self.theme_label.setFont(QFont(custom_font))
+        self.theme_label.setStyleSheet(f"""
+            QLabel {{
+                color: #6d4053;
+            }}
+        """)
 
         self.theme_dropdown = QComboBox(self)
         self.theme_dropdown.addItems(["Classic", "Space"])  # placeholder themes
@@ -84,10 +107,13 @@ class SettingsMenu(QWidget):
         theme_dropdown_img = (assets_dir / "theme_combobox.png").as_posix() # type: ignore
         theme_dropdown_arrow_img = (assets_dir / "theme_combobox_arrow.png").as_posix() # type: ignore
         theme_dropdown_list_img = (assets_dir / "theme_combobox_list.png").as_posix() # type: ignore
+        self.theme_dropdown.setFont(QFont(custom_font))
         self.theme_dropdown.setStyleSheet(f"""
             QComboBox {{
                 border-image: url({theme_dropdown_img}) 0 0 0 0;
                 padding: 10px;
+                outline: none;
+                color: #804f61;
             }}
             QComboBox::drop-down {{
                 border: none;
@@ -101,12 +127,13 @@ class SettingsMenu(QWidget):
             QComboBox QAbstractItemView {{
                 border-image: url({theme_dropdown_list_img}) 0 5 5 5;
                 border-width: 0px 5px 5px 5px;
-                background-color: #e5d5e7;
+                background-color: #fbecd7;
                 selection-background-color: #ffa3af;
+                color: #804f61;
             }}
         """)
 
-        self.test_discord_btn = QPushButton("Test Discord webhook", self)
+        self.test_discord_btn = QPushButton("Test Webhook", self)
         self.test_discord_btn.setGeometry((10*5), (66*5), (40*5), (9*5))
         test_discord_img = (assets_dir / "btn_webhook_test.png").as_posix() # type: ignore
         test_discord_pressed_img = (assets_dir / "btn_webhook_test_pressed.png").as_posix() # type: ignore
@@ -114,15 +141,18 @@ class SettingsMenu(QWidget):
             QPushButton {{
                 background-image: url({test_discord_img});
                 background-color: transparent;
-                padding: 0px;
+                padding-bottom: 5px;
                 border: none;
                 margin: 0px;
                 outline: none;
+                color: #804f61;
             }}
             QPushButton::pressed {{
                 background-image: url({test_discord_pressed_img});
                 background-color: transparent;
+                padding: 0px;
             }}
         """)
+        self.test_discord_btn.setFont(QFont(custom_font))
 
         
