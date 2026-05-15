@@ -3,13 +3,16 @@ from PyQt6.QtWidgets import \
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QPixmap, QFont, QFontDatabase
 from pathlib import Path
+import json
 
 root_dir = Path(__file__).resolve().parent.parent
 assets_dir = root_dir / "assets"
 
 class SettingsMenu(QWidget):
-    def __init__(self, parent = None, assets_dir = None):
+    def __init__(self, parent = None, assets_dir = None, config = json):
         super().__init__(parent)
+
+        self.config = config
 
         self.setFixedSize(500, 500)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -66,11 +69,11 @@ class SettingsMenu(QWidget):
         self.webhook_input.setFont(QFont(custom_font))
 
         # enable webhook checkbox
-        self.als_on_top = QCheckBox("", self)
-        self.als_on_top.setGeometry((10*5),(31*5), (50), (10*5))
+        self.webhook_checkbox = QCheckBox("", self)
+        self.webhook_checkbox.setGeometry((10*5),(31*5), (50), (10*5))
         webhook_img = (assets_dir / "on_top_checkbox.png").as_posix()   # type: ignore
         webhook_checked_img = (assets_dir / "on_top_checkbox_checked.png").as_posix()   # type: ignore
-        self.als_on_top.setStyleSheet(f"""
+        self.webhook_checkbox.setStyleSheet(f"""
             QCheckBox::indicator {{
                 width: 50px;
                 height: 50px;
@@ -186,4 +189,27 @@ class SettingsMenu(QWidget):
         """)
         self.test_discord_btn.setFont(QFont(custom_font))
 
-        
+        # initial values from config file
+        self.webhook_input.setText(self.config.get("discord_webhook_url", ""))
+        self.webhook_checkbox.setChecked(self.config.get("discord_enabled", False))
+        self.als_on_top.setChecked(self.config.get("always_on_top", False))
+
+        current_theme = self.config.get("theme", "Classic")
+        self.theme_dropdown.setCurrentText(current_theme)
+
+        # save webhook url when user finishes typing
+        self.webhook_input.editingFinished.connect(
+            lambda: self.config.set("discord_webhook_url", self.webhook_input.text())
+        )
+
+        self.webhook_checkbox.toggled.connect(
+            lambda checked: self.config.set("discord_enabled", checked)
+        )
+
+        self.als_on_top.toggled.connect(
+            lambda checked: self.config.set("always_on_top", checked)
+        )
+
+        self.theme_dropdown.currentTextChanged.connect(
+            lambda text: self.config.set("theme", text)
+        )

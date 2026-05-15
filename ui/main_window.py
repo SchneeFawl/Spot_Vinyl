@@ -13,6 +13,7 @@ from PyQt6.QtWidgets import \
 from buttons import *
 from core.song import SpotifyListener
 from settings_menu import *
+from core.config_manager import ConfigManager
 
 ASSETS_DIR = ROOT_DIR / "assets"
 
@@ -25,6 +26,10 @@ class MainWindow(QMainWindow):
         self.setFixedSize(500, 500)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)    # for transparent bg
+
+        # config
+        config_file = ROOT_DIR / "core" / "config.json"
+        self.config = ConfigManager(config_file)
 
         self.tray_icon = QSystemTrayIcon()
         self.tray_icon.setIcon(QIcon(str(ASSETS_DIR / "icon.png")))
@@ -61,7 +66,8 @@ class MainWindow(QMainWindow):
         self.main_page = QWidget()
         self.main_page.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
 
-        self.settings_page = SettingsMenu(parent=self, assets_dir=ASSETS_DIR)
+        self.settings_page = SettingsMenu(parent=self, assets_dir=ASSETS_DIR,
+                                          config=self.config)
 
         # nameplate
         nameplate_l = QLabel(self.main_page)
