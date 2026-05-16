@@ -9,7 +9,7 @@ root_dir = Path(__file__).resolve().parent.parent
 assets_dir = root_dir / "assets"
 
 class SettingsMenu(QWidget):
-    def __init__(self, parent = None, assets_dir = None, config = json):
+    def __init__(self, parent = None, assets_dir = None, config = None):
         super().__init__(parent)
 
         self.config = config

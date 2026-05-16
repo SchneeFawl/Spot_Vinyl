@@ -1,6 +1,6 @@
 {
-    "discord_webhook_url": "",
-    "discord_enabled": false,
+    "discord_webhook_url": "https://discord.com/api/webhooks/1504849084735819807/Xj3BRWj6ehaT870PJkHKaeb37QVJNUAVypmM6d4hWw6fDGrR42D7HwzDQ4PinrQMosFj",
+    "discord_enabled": true,
     "always_on_top": false,
     "theme": "Classic"
 }

@@ -5,7 +5,7 @@ from pathlib import Path
 ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
 
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import \
     QPixmap, QMovie, QFontMetrics, QFontDatabase, QFont, QAction, QIcon
 from PyQt6.QtWidgets import \
@@ -14,6 +14,7 @@ from buttons import *
 from core.song import SpotifyListener
 from settings_menu import *
 from core.config_manager import ConfigManager
+from core.discord import send_discord_webhook
 
 ASSETS_DIR = ROOT_DIR / "assets"
 
@@ -21,8 +22,13 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        # load icon bytes for discord webhook
+        icon_path = ASSETS_DIR / "icon.png"
+        with open(icon_path, "rb") as f:
+            self.icon_bytes = f.read()
+
         self.setWindowTitle("Spot_Vinyl")
-        self.setWindowIcon(QIcon(str(ASSETS_DIR / "icon.png")))
+        self.setWindowIcon(QIcon(str(icon_path)))
         self.setFixedSize(500, 500)
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint)
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)    # for transparent bg
@@ -124,6 +130,15 @@ class MainWindow(QMainWindow):
         vinyl_label.setScaledContents(True)
         self.vinyl.start()
 
+        # track the last song title to avoid spamming the discord on play/pause
+        self.last_sent_song = ""
+
+        # webhook debounce timer
+        self.webhook_timer = QTimer()
+        self.webhook_timer.setSingleShot(True)
+        self.webhook_timer.setInterval(5000)
+        self.webhook_timer.timeout.connect(self.dispatch_webhook)
+
         self.stacked_widget.addWidget(self.main_page)           # index 0
         self.stacked_widget.addWidget(self.settings_page)       # index 1
 
@@ -139,6 +154,7 @@ class MainWindow(QMainWindow):
         self.nextButton = next_button(self.main_page)
 
         self.settings_page.stng_close_btn.clicked.connect(self.show_main_page)
+        self.settings_page.test_discord_btn.clicked.connect(self.send_webhook_test)
 
         # background listeners
         self.listener = SpotifyListener()
@@ -223,6 +239,42 @@ class MainWindow(QMainWindow):
                 background-color: transparent;
             }}
         """)
+
+        # discord webhook
+        if self.config.get("discord_enabled", False):
+            current_song_id = f"{title} - {artist}"
+            if current_song_id != self.last_sent_song and is_playing:
+                self.pending_webhook_data = (title, artist, image_bytes)
+                self.webhook_timer.stop()
+                self.webhook_timer.start()
+                self.last_sent_song = current_song_id
+
+    def dispatch_webhook(self):
+        if self.pending_webhook_data:
+            title, artist, image_bytes = self.pending_webhook_data
+            send_discord_webhook(
+                webhook_url=self.config.get("discord_webhook_url"),
+                title=title,
+                artist=artist,
+                image_bytes=image_bytes,
+                icon=self.icon_bytes
+            )
+            self.pending_webhook_data = None        # clear the pending data
+
+    def send_webhook_test(self):
+        url = self.config.get("discord_webhook_url")
+        if not url:
+            print("No Webhook URL saved")
+            return
+        
+        # placeholder forr test
+        send_discord_webhook(
+            webhook_url=url,
+            title="Test Title",
+            artist="Test Artist",
+            image_bytes=b"",     # empty byte string as cover
+            icon=self.icon_bytes
+        )
 
     def toggle_window(self):
         if self.isVisible():
