@@ -5,6 +5,7 @@ test.py
 core/song_cover.png
 core/song_image.png
 core/cover.py
+extras
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
