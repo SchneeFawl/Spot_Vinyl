@@ -4,8 +4,14 @@ from PyQt6.QtWidgets import QPushButton
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
 from pathlib import Path
+import sys
 
-PROJECT_DIR = Path(__file__).resolve().parent.parent
+# PATH FIX FOR PYINSTALLER !!!
+if getattr(sys, "frozen", False):
+    PROJECT_DIR = Path(sys._MEIPASS)
+else:
+    PROJECT_DIR = Path(__file__).resolve().parent.parent
+
 ASSET_DIR = PROJECT_DIR / "assets"
 
 def close_button(parent) -> QPushButton:

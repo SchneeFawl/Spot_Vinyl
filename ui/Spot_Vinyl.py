@@ -1,9 +1,17 @@
 import sys
 import ctypes
 from pathlib import Path
-# root directory for the project
-ROOT_DIR = Path(__file__).resolve().parent.parent
-sys.path.append(str(ROOT_DIR))
+
+# PATH FIX FOR PYINSTALLER!!!
+if getattr(sys, "frozen", False):
+    # running as packaged exe in the _MEIPASS temp folder
+    ROOT_DIR = Path(sys._MEIPASS)
+    sys.path.append(str(ROOT_DIR))
+else:
+    # running normally from terminal
+    ROOT_DIR = Path(__file__).resolve().parent.parent
+    sys.path.append(str(ROOT_DIR))
+    sys.path.append(str(ROOT_DIR / "ui"))
 
 from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import \
@@ -34,7 +42,11 @@ class MainWindow(QMainWindow):
         self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)    # for transparent bg
 
         # config
-        config_file = ROOT_DIR / "core" / "config.json"
+        # if running as exe then config file stays in the same dir as exe file
+        if getattr(sys, "frozen", False):
+            config_file = Path(sys.executable).parent / "config.json"
+        else:    # if running from terminal, then in ./core dir
+            config_file = ROOT_DIR / "core" / "config.json"
         self.config = ConfigManager(config_file)
 
         self.tray_icon = QSystemTrayIcon()
@@ -155,6 +167,9 @@ class MainWindow(QMainWindow):
 
         self.settings_page.stng_close_btn.clicked.connect(self.show_main_page)
         self.settings_page.test_discord_btn.clicked.connect(self.send_webhook_test)
+        initial_on_top = self.config.get("always_on_top", False)
+        self.update_always_on_top(initial_on_top)
+        self.settings_page.als_on_top.toggled.connect(self.update_always_on_top)
 
         # background listeners
         self.listener = SpotifyListener()
@@ -275,6 +290,10 @@ class MainWindow(QMainWindow):
             image_bytes=b"",     # empty byte string as cover
             icon=self.icon_bytes
         )
+
+    def update_always_on_top(self, enabled):
+        self.setWindowFlag(Qt.WindowType.WindowStaysOnTopHint, enabled)
+        self.show()     # refreshing the window
 
     def toggle_window(self):
         if self.isVisible():
