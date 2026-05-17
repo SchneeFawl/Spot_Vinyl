@@ -14,7 +14,7 @@ Spot_Vinyl is a minimalist, pixel-art desktop widget which brings a different ae
 
 Unlike other widgets, **Spot_Vinyl does not require a Spotify API**. It works by tapping directly into the **Windows Global System Media Transport Controls (GSMTC)** via **WinRT**. This means that it can listen to whatever Spotify is playing locally on your machine with zero configuration and zero privacy concerns regarding your Spotify account crredentials.
 
-## 📸 Screenshots
+## Screenshots
 
 |             Main menu              |               Settings Menu                |
 | :--------------------------------: | :----------------------------------------: |
@@ -24,7 +24,7 @@ Unlike other widgets, **Spot_Vinyl does not require a Spotify API**. It works by
 | :------------------------------------: | :---------------------------------------------: |
 | ![Main](repo_assets/discord_embed.png) | ![Settings](repo_assets/discord_embed_test.png) |
 
-## 📦 Installation
+## Installation
 
 1. Head over to [Releases](https://github.com/SchneeFawl/Spot_Vinyl/releases/tag/v1.0) tab
 2. Download the latest `Spot_Vinyl.exe`
@@ -40,13 +40,13 @@ Unlike other widgets, **Spot_Vinyl does not require a Spotify API**. It works by
 - **Always on Top mode**: Keep the vinyl spinning above all your other apps
 - **Lightweight**: Optimized to use minimal CPU and RAM (only 45MB)
 
-## 🛠 Development Setup
+## Development Setup
 
 If you want to run the source code or contribute:
 
 - **Environment**: Windows 10/11 (required for WinRT/GSMTC integration)
 
-## 🤝 Support
+## Support
 
 - **Bugs and Suggestions**: Found a bug or have an idea? Open an [Issue](https://github.com/SchneeFawl/Spot_Vinyl/issues)
 - **Questions**: Want to show off your custom themes or ask a question? Join the [Discussions](https://github.com/SchneeFawl/Spot_Vinyl/discussions)
