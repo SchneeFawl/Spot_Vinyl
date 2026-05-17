@@ -29,11 +29,11 @@ Unlike other widgets, **Spot_Vinyl does not require a Spotify API**. It works by
 1. Head over to [Releases](https://github.com/SchneeFawl/Spot_Vinyl/releases/tag/v1.0) tab
 2. Download the latest `Spot_Vinyl.exe`
 3. Paste that executable in a newly created folder and run it!
-   (No installation required, its a portable app)
+   (No installation required its a portable app, just need to keep Spotify open)
 
 ## ✨ Features
 
-- **Zero-config setup**: Works out of the box with Spotify for Windows
+- **Zero-config setup**: Works out of the box with Spotify for Windows (you need to keep Spotify open in the background)
 - **Pixel-art aesthetic**: Custom UI built from scratch using [Aseprite](https://github.com/aseprite/aseprite)
 - **Discord Webhooks**: Automatically post your current song to a Discord channel with an embed which includes a link Spotify song link
 - **Intelligent Debouncing**: Skips rapid track changes (5s delay) to prevent Discord webhook spam
