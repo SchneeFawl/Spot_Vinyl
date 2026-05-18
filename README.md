@@ -1,4 +1,4 @@
-<p align-"center">
+<p align="center">
     <img src="repo_assets/Banner.gif" alt="Banner">
 </p>
 
