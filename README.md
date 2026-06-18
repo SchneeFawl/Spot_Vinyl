@@ -47,12 +47,6 @@ Unlike other widgets, **Spot_Vinyl does not require a Spotify API**. It works by
 - Make the app **auto-launch Spotify**
 - Make the app **window re-sizeable**
 
-## Development Setup
-
-If you want to run the source code or contribute:
-
-- **Environment**: Windows 10/11 (required for WinRT/GSMTC integration)
-
 ## Support
 
 - **Bugs and Suggestions**: Found a bug or have an idea? Open an [Issue](https://github.com/SchneeFawl/Spot_Vinyl/issues)
@@ -61,3 +55,12 @@ If you want to run the source code or contribute:
 ---
 
 Created with ♥ by SchneeFawl
+
+<p align="center">
+    <a href="LICENSE.md">
+        MIT License
+    </a> &bull;
+    <a href="CONTRIBUTING.md">
+        Contributing
+    </a>
+</p>
