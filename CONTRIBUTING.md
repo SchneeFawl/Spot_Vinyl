@@ -12,7 +12,7 @@
 
 ## Development Setup
 
-### Creating a virtual environment:
+### Creating a virtual environment and installing dependencies:
 
 #### If using **uv**:
 ```
@@ -32,9 +32,26 @@ python -m venv venv
 .venv\Scripts\activate
 ```
 
-#### If using powershell:
+#### If using Powershell:
 ```
 .venv\Scripts\Activate.ps1
+```
+
+#### If using GitBash:
+```
+source .venv/Scripts/activate
+```
+
+### Installing dependencies:
+
+#### If using uv:
+```
+uv pip install -r requirements.txt
+```
+
+#### If using pip:
+```
+pip install -r requirements.txt
 ```
 
 ---
